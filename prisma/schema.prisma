@@ -6,12 +6,25 @@ datasource db {
   provider = "postgresql"
 }
 
-model users {
-  id String @id @default(uuid())
+enum AuthProvider {
+  GOOGLE
+  APPLE
+}
 
-  created_at DateTime  @default(now()) @db.Timestamptz
-  updated_at DateTime  @updatedAt @db.Timestamptz
-  deleted_at DateTime? @db.Timestamptz
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model users {
+  id               String       @id @default(uuid())
+  email            String       @unique @db.VarChar(255)
+  auth_provider    AuthProvider @default(GOOGLE)
+  auth_provider_id String
+  status           UserStatus   @default(ACTIVE)
+  created_at       DateTime     @default(now()) @db.Timestamptz
+  updated_at       DateTime     @updatedAt @db.Timestamptz
+  deleted_at       DateTime?    @db.Timestamptz
 
   // relations
   tasks tasks[]
