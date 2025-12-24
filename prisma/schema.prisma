@@ -1,0 +1,34 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model users {
+  id String @id @default(uuid())
+
+  created_at DateTime  @default(now()) @db.Timestamptz
+  updated_at DateTime  @updatedAt @db.Timestamptz
+  deleted_at DateTime? @db.Timestamptz
+
+  // relations
+  tasks tasks[]
+}
+
+model tasks {
+  id        String  @id @default(uuid())
+  user_id   String
+  title     String
+  is_active Boolean @default(false)
+
+  created_at DateTime  @default(now()) @db.Timestamptz
+  updated_at DateTime  @updatedAt @db.Timestamptz
+  deleted_at DateTime? @db.Timestamptz
+
+  // relations
+  user users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+}
