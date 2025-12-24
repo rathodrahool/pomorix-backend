@@ -4,6 +4,9 @@ export const MESSAGE = {
     UPDATE: (module: string) => `${module} updated successfully`,
     DELETE: (module: string) => `${module} deleted successfully`,
     RETRIEVE: (module: string) => `${module} retrieved successfully`,
+    AUTH: {
+      SIGNIN: 'Authentication successful',
+    },
   },
   ERROR: {
     NOT_FOUND: (module: string) => `${module} not found`,

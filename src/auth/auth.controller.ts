@@ -1,24 +1,24 @@
 import { Controller, Post, Body, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import type { SignupDto } from './dto/signup.dto';
 import { JoiValidationPipe } from '../common/joi-validation.pipe';
-import { signupSchema } from './validation/auth.validation';
+import { signinSchema } from './validation/auth.validation';
 import { ApiResponse } from '../common/api-response';
 import { MESSAGE } from '../common/response-messages';
+import type { SigninDto } from './dto/signin.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
 
-  @Post('signup')
-  async signup(
-    @Body(new JoiValidationPipe(signupSchema))
-    signupDto: SignupDto,
+  @Post('signin')
+  async signin(
+    @Body(new JoiValidationPipe(signinSchema))
+    signinDto: SigninDto,
   ) {
-    const result = await this.authService.signup(signupDto);
+    const result = await this.authService.signin(signinDto);
     return ApiResponse.success(
-      HttpStatus.CREATED,
-      MESSAGE.SUCCESS.CREATE('User'),
+      HttpStatus.OK,
+      MESSAGE.SUCCESS.AUTH.SIGNIN,
       result,
     );
   }
