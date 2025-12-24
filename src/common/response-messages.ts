@@ -12,5 +12,10 @@ export const MESSAGE = {
     NOT_FOUND: (module: string) => `${module} not found`,
     ALREADY_EXISTS: (module: string) => `${module} already exists`,
     INVALID_DATA: (module: string) => `Invalid ${module.toLowerCase()} data`,
+    AUTH: {
+      NO_TOKEN: 'No token provided',
+      INVALID_TOKEN: 'Invalid or expired token',
+      USER_NOT_FOUND: 'User not found or inactive',
+    },
   },
 };
