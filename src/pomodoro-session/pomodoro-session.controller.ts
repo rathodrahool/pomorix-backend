@@ -47,4 +47,24 @@ export class PomodoroSessionController {
       session,
     );
   }
+
+  @Post('pause')
+  @UseGuards(JwtAuthGuard)
+  async pause(@CurrentUser() user: AuthenticatedUser) {
+    await this.pomodoroSessionService.pause(user.id);
+    return ApiResponse.success(
+      HttpStatus.OK,
+      MESSAGE.SUCCESS.POMODORO.PAUSED,
+    );
+  }
+
+  @Post('resume')
+  @UseGuards(JwtAuthGuard)
+  async resume(@CurrentUser() user: AuthenticatedUser) {
+    await this.pomodoroSessionService.resume(user.id);
+    return ApiResponse.success(
+      HttpStatus.OK,
+      MESSAGE.SUCCESS.POMODORO.RESUMED,
+    );
+  }
 }

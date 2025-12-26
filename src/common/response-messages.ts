@@ -11,6 +11,8 @@ export const MESSAGE = {
       STARTED: 'Pomodoro session started successfully',
       CURRENT: 'Current session retrieved successfully',
       NO_ACTIVE: 'No active session',
+      PAUSED: 'Pomodoro session paused successfully',
+      RESUMED: 'Pomodoro session resumed successfully',
     },
   },
   ERROR: {
@@ -25,6 +27,9 @@ export const MESSAGE = {
     POMODORO: {
       NO_ACTIVE_TASK: 'No active task found. Please set a task as active first.',
       ACTIVE_SESSION_EXISTS: 'An active Pomodoro session already exists. Please complete or abort it first.',
+      NO_ACTIVE_SESSION: 'No active Pomodoro session found',
+      ALREADY_PAUSED: 'Session is already paused',
+      NOT_PAUSED: 'Session is not paused',
     },
   },
 };

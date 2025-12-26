@@ -128,4 +128,68 @@ export class PomodoroSessionService {
             elapsed_seconds: elapsedSeconds,
         };
     }
+
+    async pause(userId: string) {
+        // Find active session
+        const session = await this.prisma.pomodoro_sessions.findFirst({
+            where: {
+                user_id: userId,
+                state: {
+                    in: [PomodoroSessionState.FOCUS, PomodoroSessionState.BREAK],
+                },
+            },
+        });
+
+        if (!session) {
+            throw new BadRequestException(MESSAGE.ERROR.POMODORO.NO_ACTIVE_SESSION);
+        }
+
+        // Check if already paused
+        if (session.paused_at) {
+            throw new BadRequestException(MESSAGE.ERROR.POMODORO.ALREADY_PAUSED);
+        }
+
+        // Pause the session by setting paused_at timestamp
+        await this.prisma.pomodoro_sessions.update({
+            where: { id: session.id },
+            data: {
+                paused_at: new Date(),
+            },
+        });
+    }
+
+    async resume(userId: string) {
+        // Find active session
+        const session = await this.prisma.pomodoro_sessions.findFirst({
+            where: {
+                user_id: userId,
+                state: {
+                    in: [PomodoroSessionState.FOCUS, PomodoroSessionState.BREAK],
+                },
+            },
+        });
+
+        if (!session) {
+            throw new BadRequestException(MESSAGE.ERROR.POMODORO.NO_ACTIVE_SESSION);
+        }
+
+        // Check if session is paused
+        if (!session.paused_at) {
+            throw new BadRequestException(MESSAGE.ERROR.POMODORO.NOT_PAUSED);
+        }
+
+        // Calculate pause duration
+        const now = new Date();
+        const pausedAt = new Date(session.paused_at);
+        const pauseDurationSeconds = Math.floor((now.getTime() - pausedAt.getTime()) / 1000);
+
+        // Resume by clearing paused_at and adding to total_pause_seconds
+        await this.prisma.pomodoro_sessions.update({
+            where: { id: session.id },
+            data: {
+                paused_at: null,
+                total_pause_seconds: session.total_pause_seconds + pauseDurationSeconds,
+            },
+        });
+    }
 }
