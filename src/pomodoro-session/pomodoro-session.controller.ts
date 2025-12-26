@@ -67,4 +67,14 @@ export class PomodoroSessionController {
       MESSAGE.SUCCESS.POMODORO.RESUMED,
     );
   }
+
+  @Post('complete')
+  @UseGuards(JwtAuthGuard)
+  async complete(@CurrentUser() user: AuthenticatedUser) {
+    await this.pomodoroSessionService.complete(user.id);
+    return ApiResponse.success(
+      HttpStatus.OK,
+      MESSAGE.SUCCESS.POMODORO.COMPLETED,
+    );
+  }
 }

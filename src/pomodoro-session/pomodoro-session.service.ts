@@ -192,4 +192,39 @@ export class PomodoroSessionService {
             },
         });
     }
+
+    async complete(userId: string) {
+        // Find active session
+        const session = await this.prisma.pomodoro_sessions.findFirst({
+            where: {
+                user_id: userId,
+                state: {
+                    in: [PomodoroSessionState.FOCUS, PomodoroSessionState.BREAK],
+                },
+            },
+        });
+
+        if (!session) {
+            throw new BadRequestException(MESSAGE.ERROR.POMODORO.NO_ACTIVE_SESSION);
+        }
+
+        // Only FOCUS sessions can be completed
+        // BREAK sessions should just transition or be handled differently
+        if (session.state !== PomodoroSessionState.FOCUS) {
+            throw new BadRequestException(MESSAGE.ERROR.POMODORO.CANNOT_COMPLETE);
+        }
+
+        // Mark session as completed
+        await this.prisma.pomodoro_sessions.update({
+            where: { id: session.id },
+            data: {
+                state: PomodoroSessionState.COMPLETED,
+                ended_at: new Date(),
+                paused_at: null, // Clear pause if any
+            },
+        });
+
+        // TODO: Emit SESSION_COMPLETED event for streak/badge/stats modules
+        // This will be implemented when we add those modules
+    }
 }

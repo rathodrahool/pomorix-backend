@@ -13,6 +13,7 @@ export const MESSAGE = {
       NO_ACTIVE: 'No active session',
       PAUSED: 'Pomodoro session paused successfully',
       RESUMED: 'Pomodoro session resumed successfully',
+      COMPLETED: 'Pomodoro session completed successfully',
     },
   },
   ERROR: {
@@ -30,6 +31,7 @@ export const MESSAGE = {
       NO_ACTIVE_SESSION: 'No active Pomodoro session found',
       ALREADY_PAUSED: 'Session is already paused',
       NOT_PAUSED: 'Session is not paused',
+      CANNOT_COMPLETE: 'Only focus sessions can be completed',
     },
   },
 };
