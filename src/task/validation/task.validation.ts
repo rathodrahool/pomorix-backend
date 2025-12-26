@@ -1,7 +1,6 @@
 import * as Joi from 'joi';
 
 export const createTaskSchema = Joi.object({
-    user_id: Joi.string().uuid().required(),
     title: Joi.string().trim().min(1).max(500).required(),
 });
 

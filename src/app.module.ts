@@ -5,6 +5,8 @@ import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { envValidationSchema } from './config/env.validation';
 import { TaskModule } from './task/task.module';
+import { JwtModule } from './jwt/jwt.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -19,6 +21,8 @@ import { TaskModule } from './task/task.module';
     }), // load .env
     PrismaModule,
     TaskModule,
+    JwtModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
