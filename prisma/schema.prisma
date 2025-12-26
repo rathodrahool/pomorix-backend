@@ -16,6 +16,13 @@ enum UserStatus {
   INACTIVE
 }
 
+enum PomodoroSessionState {
+  FOCUS
+  BREAK
+  COMPLETED
+  ABORTED
+}
+
 model users {
   id               String       @id @default(uuid())
   email            String       @unique @db.VarChar(255)
@@ -27,7 +34,8 @@ model users {
   deleted_at       DateTime?    @db.Timestamptz
 
   // relations
-  tasks tasks[]
+  tasks            tasks[]
+  pomodoroSessions pomodoro_sessions[]
 }
 
 model tasks {
@@ -41,7 +49,36 @@ model tasks {
   deleted_at DateTime? @db.Timestamptz
 
   // relations
-  user users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user             users               @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  pomodoroSessions pomodoro_sessions[]
 
   @@index([user_id])
+}
+
+model pomodoro_sessions {
+  id String @id @default(uuid())
+
+  user_id String
+  task_id String
+
+  state PomodoroSessionState
+
+  focus_duration_seconds Int
+  break_duration_seconds Int
+
+  started_at DateTime  @db.Timestamptz
+  ended_at   DateTime? @db.Timestamptz
+
+  paused_at           DateTime? @db.Timestamptz
+  total_pause_seconds Int       @default(0)
+
+  created_at DateTime @default(now()) @db.Timestamptz
+  updated_at DateTime @updatedAt @db.Timestamptz
+
+  // relations
+  user users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  task tasks @relation(fields: [task_id], references: [id], onDelete: Restrict)
+
+  @@index([user_id])
+  @@index([user_id, started_at(sort: Desc)])
 }
