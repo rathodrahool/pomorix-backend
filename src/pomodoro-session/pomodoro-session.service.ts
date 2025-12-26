@@ -2,6 +2,7 @@ import { Injectable, BadRequestException, NotFoundException } from '@nestjs/comm
 import { PrismaService } from 'src/prisma/prisma.service';
 import type { StartPomodoroDto } from './dto/start-pomodoro.dto';
 import { PomodoroSessionState } from '@prisma/client';
+import { MESSAGE } from 'src/common/response-messages';
 
 @Injectable()
 export class PomodoroSessionService {
@@ -18,7 +19,7 @@ export class PomodoroSessionService {
         });
 
         if (!activeTask) {
-            throw new BadRequestException('No active task found. Please set a task as active first.');
+            throw new BadRequestException(MESSAGE.ERROR.POMODORO.NO_ACTIVE_TASK);
         }
 
         // Business Rule 2: Check if there's already an active session
@@ -32,7 +33,7 @@ export class PomodoroSessionService {
         });
 
         if (existingSession) {
-            throw new BadRequestException('An active Pomodoro session already exists. Please complete or abort it first.');
+            throw new BadRequestException(MESSAGE.ERROR.POMODORO.ACTIVE_SESSION_EXISTS);
         }
 
         // Create new session
@@ -63,6 +64,68 @@ export class PomodoroSessionService {
             focus_duration_seconds: session.focus_duration_seconds,
             break_duration_seconds: session.break_duration_seconds,
             started_at: session.started_at,
+        };
+    }
+
+    async getCurrent(userId: string) {
+        // Find active session (focus or break state)
+        const session = await this.prisma.pomodoro_sessions.findFirst({
+            where: {
+                user_id: userId,
+                state: {
+                    in: [PomodoroSessionState.FOCUS, PomodoroSessionState.BREAK],
+                },
+            },
+            include: {
+                task: {
+                    select: {
+                        id: true,
+                        title: true,
+                    },
+                },
+            },
+        });
+
+        if (!session) {
+            return null;
+        }
+
+        // Calculate remaining time
+        const now = new Date();
+        const startedAt = new Date(session.started_at);
+
+        // Calculate elapsed time (excluding pauses)
+        let elapsedSeconds = Math.floor((now.getTime() - startedAt.getTime()) / 1000);
+
+        // Subtract total pause time
+        elapsedSeconds -= session.total_pause_seconds;
+
+        // If currently paused, don't count time since pause
+        if (session.paused_at) {
+            const pausedAt = new Date(session.paused_at);
+            const pausedDuration = Math.floor((now.getTime() - pausedAt.getTime()) / 1000);
+            elapsedSeconds -= pausedDuration;
+        }
+
+        // Determine duration based on current state
+        const totalDuration = session.state === PomodoroSessionState.FOCUS
+            ? session.focus_duration_seconds
+            : session.break_duration_seconds;
+
+        const remainingSeconds = Math.max(0, totalDuration - elapsedSeconds);
+
+        return {
+            session_id: session.id,
+            task_id: session.task_id,
+            task_title: session.task.title,
+            state: session.state,
+            focus_duration_seconds: session.focus_duration_seconds,
+            break_duration_seconds: session.break_duration_seconds,
+            started_at: session.started_at,
+            paused_at: session.paused_at,
+            is_paused: session.paused_at !== null,
+            remaining_seconds: remainingSeconds,
+            elapsed_seconds: elapsedSeconds,
         };
     }
 }
