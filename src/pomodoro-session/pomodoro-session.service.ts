@@ -202,6 +202,9 @@ export class PomodoroSessionService {
                     in: [PomodoroSessionState.FOCUS, PomodoroSessionState.BREAK],
                 },
             },
+            include: {
+                task: true, // Include task to check estimation
+            },
         });
 
         if (!session) {
@@ -209,19 +212,46 @@ export class PomodoroSessionService {
         }
 
         // Only FOCUS sessions can be completed
-        // BREAK sessions should just transition or be handled differently
         if (session.state !== PomodoroSessionState.FOCUS) {
             throw new BadRequestException(MESSAGE.ERROR.POMODORO.CANNOT_COMPLETE);
         }
 
-        // Mark session as completed
-        await this.prisma.pomodoro_sessions.update({
-            where: { id: session.id },
-            data: {
-                state: PomodoroSessionState.COMPLETED,
-                ended_at: new Date(),
-                paused_at: null, // Clear pause if any
-            },
+        // Use transaction to ensure atomicity
+        await this.prisma.$transaction(async (tx) => {
+            // 1. Mark session as completed
+            await tx.pomodoro_sessions.update({
+                where: { id: session.id },
+                data: {
+                    state: PomodoroSessionState.COMPLETED,
+                    ended_at: new Date(),
+                    paused_at: null,
+                },
+            });
+
+            // 2. Increment completed_pomodoros count
+            const updatedTask = await tx.tasks.update({
+                where: { id: session.task_id },
+                data: {
+                    completed_pomodoros: {
+                        increment: 1,
+                    },
+                },
+            });
+
+            // 3. Auto-complete task if estimation is met
+            const newCompletedCount = updatedTask.completed_pomodoros;
+            if (
+                updatedTask.estimated_pomodoros &&
+                newCompletedCount >= updatedTask.estimated_pomodoros
+            ) {
+                await tx.tasks.update({
+                    where: { id: session.task_id },
+                    data: {
+                        is_completed: true,
+                        is_active: false, // Deactivate completed task
+                    },
+                });
+            }
         });
 
         // TODO: Emit SESSION_COMPLETED event for streak/badge/stats modules

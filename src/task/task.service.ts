@@ -15,6 +15,7 @@ export class TaskService {
             data: {
                 user_id: userId,
                 title: dto.title,
+                estimated_pomodoros: dto.estimated_pomodoros,
             },
         });
     }

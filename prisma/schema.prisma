@@ -44,6 +44,11 @@ model tasks {
   title     String
   is_active Boolean @default(false)
 
+  // Pomodoro estimation and tracking
+  estimated_pomodoros Int? // How many Pomodoros estimated for this task
+  completed_pomodoros Int     @default(0) // How many Pomodoros completed
+  is_completed        Boolean @default(false) // Auto-set when completed == estimated
+
   created_at DateTime  @default(now()) @db.Timestamptz
   updated_at DateTime  @updatedAt @db.Timestamptz
   deleted_at DateTime? @db.Timestamptz
