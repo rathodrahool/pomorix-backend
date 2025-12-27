@@ -251,6 +251,25 @@ export class PomodoroSessionService {
                         is_active: false, // Deactivate completed task
                     },
                 });
+
+                // 4. Auto-activate the next incomplete task
+                const nextTask = await tx.tasks.findFirst({
+                    where: {
+                        user_id: userId,
+                        deleted_at: null,
+                        is_completed: false,
+                    },
+                    orderBy: {
+                        created_at: 'asc', // FIFO: oldest first
+                    },
+                });
+
+                if (nextTask) {
+                    await tx.tasks.update({
+                        where: { id: nextTask.id },
+                        data: { is_active: true },
+                    });
+                }
             }
         });
 
