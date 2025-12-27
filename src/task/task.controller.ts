@@ -34,8 +34,8 @@ export class TaskController {
     @Body(new JoiValidationPipe(createTaskSchema))
     createTaskDto: CreateTaskDto,
   ) {
-    await this.taskService.create(user.id, createTaskDto);
-    return ApiResponse.success(HttpStatus.CREATED, MESSAGE.SUCCESS.CREATE('Task'));
+    const result = await this.taskService.create(user.id, createTaskDto);
+    return ApiResponse.success(HttpStatus.CREATED, MESSAGE.SUCCESS.CREATE('Task'), result);
   }
 
   @Get()
