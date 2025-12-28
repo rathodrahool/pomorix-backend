@@ -8,6 +8,7 @@ import { TaskModule } from './task/task.module';
 import { JwtModule } from './jwt/jwt.module';
 import { AuthModule } from './auth/auth.module';
 import { PomodoroSessionModule } from './pomodoro-session/pomodoro-session.module';
+import { UserSettingsModule } from './user-settings/user-settings.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { PomodoroSessionModule } from './pomodoro-session/pomodoro-session.modul
     JwtModule,
     AuthModule,
     PomodoroSessionModule,
+    UserSettingsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

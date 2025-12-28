@@ -15,6 +15,11 @@ export const MESSAGE = {
       RESUMED: 'Pomodoro session resumed successfully',
       COMPLETED: 'Pomodoro session completed successfully',
     },
+    USER_SETTINGS: {
+      RETRIEVED: 'User settings retrieved successfully',
+      UPDATED: 'User settings updated successfully',
+      RESET: 'User settings reset to defaults successfully',
+    },
   },
   ERROR: {
     NOT_FOUND: (module: string) => `${module} not found`,
