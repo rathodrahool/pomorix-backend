@@ -11,12 +11,14 @@ export class TaskService {
     constructor(private readonly prisma: PrismaService) { }
 
     async create(userId: string, dto: CreateTaskDto) {
-        await this.prisma.tasks.create({
+        const result = await this.prisma.tasks.create({
             data: {
                 user_id: userId,
                 title: dto.title,
+                estimated_pomodoros: dto.estimated_pomodoros,
             },
         });
+        return { id: result.id };
     }
 
     async findAll(userId: string, query: FindAllTasksDto) {

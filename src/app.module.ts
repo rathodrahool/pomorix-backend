@@ -7,6 +7,7 @@ import { envValidationSchema } from './config/env.validation';
 import { TaskModule } from './task/task.module';
 import { JwtModule } from './jwt/jwt.module';
 import { AuthModule } from './auth/auth.module';
+import { PomodoroSessionModule } from './pomodoro-session/pomodoro-session.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { AuthModule } from './auth/auth.module';
     TaskModule,
     JwtModule,
     AuthModule,
+    PomodoroSessionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
