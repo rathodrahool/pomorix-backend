@@ -23,6 +23,20 @@ enum PomodoroSessionState {
   ABORTED
 }
 
+enum AlarmSound {
+  BELLS
+  DIGITAL
+  BIRD
+  NONE
+}
+
+enum TickingSound {
+  NONE
+  TICKING_FAST
+  TICKING_SLOW
+  WHITE_NOISE
+}
+
 model users {
   id               String       @id @default(uuid())
   email            String       @unique @db.VarChar(255)
@@ -36,6 +50,7 @@ model users {
   // relations
   tasks            tasks[]
   pomodoroSessions pomodoro_sessions[]
+  userSettings     user_settings?
 }
 
 model tasks {
@@ -86,4 +101,31 @@ model pomodoro_sessions {
 
   @@index([user_id])
   @@index([user_id, started_at(sort: Desc)])
+}
+
+model user_settings {
+  id      String @id @default(uuid())
+  user_id String @unique
+
+  // Timer Settings (in minutes)
+  pomodoro_duration Int @default(25) // 5-60 minutes
+  short_break       Int @default(5) // 1-15 minutes
+  long_break        Int @default(15) // 5-45 minutes
+
+  // Sounds & Notifications
+  alarm_sound   AlarmSound   @default(BELLS)
+  ticking_sound TickingSound @default(NONE)
+  volume        Int          @default(50) // 0-100%
+
+  // Automation
+  auto_start_breaks    Boolean @default(false)
+  auto_start_pomodoros Boolean @default(true)
+
+  created_at DateTime @default(now()) @db.Timestamptz
+  updated_at DateTime @updatedAt @db.Timestamptz
+
+  // relations
+  user users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
 }
