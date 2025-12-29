@@ -57,6 +57,8 @@ model users {
   tasks            tasks[]
   pomodoroSessions pomodoro_sessions[]
   userSettings     user_settings?
+  userStreak       user_streaks?
+  dailyActivities  daily_activity[]
 }
 
 model tasks {
@@ -133,5 +135,39 @@ model user_settings {
   // relations
   user users @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
+  @@index([user_id])
+}
+
+model user_streaks {
+  id      String @id @default(uuid())
+  user_id String @unique
+
+  current_streak Int @default(0)
+  longest_streak Int @default(0)
+
+  last_active_date DateTime? @db.Date
+
+  created_at DateTime @default(now()) @db.Timestamptz
+  updated_at DateTime @updatedAt @db.Timestamptz
+
+  // relations
+  user users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+}
+
+model daily_activity {
+  user_id       String
+  activity_date DateTime @db.Date
+
+  pomodoro_count Int @default(1)
+
+  created_at DateTime @default(now()) @db.Timestamptz
+  updated_at DateTime @updatedAt @db.Timestamptz
+
+  // relations
+  user users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@id([user_id, activity_date])
   @@index([user_id])
 }

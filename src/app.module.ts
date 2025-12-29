@@ -9,6 +9,7 @@ import { JwtModule } from './jwt/jwt.module';
 import { AuthModule } from './auth/auth.module';
 import { PomodoroSessionModule } from './pomodoro-session/pomodoro-session.module';
 import { UserSettingsModule } from './user-settings/user-settings.module';
+import { StreakModule } from './streak/streak.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { UserSettingsModule } from './user-settings/user-settings.module';
     AuthModule,
     PomodoroSessionModule,
     UserSettingsModule,
+    StreakModule,
   ],
   controllers: [AppController],
   providers: [AppService],
