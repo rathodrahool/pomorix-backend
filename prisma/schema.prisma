@@ -23,6 +23,12 @@ enum PomodoroSessionState {
   ABORTED
 }
 
+enum SessionType {
+  FOCUS
+  SHORT_BREAK
+  LONG_BREAK
+}
+
 enum AlarmSound {
   BELLS
   DIGITAL
@@ -81,10 +87,10 @@ model pomodoro_sessions {
   user_id String
   task_id String
 
-  state PomodoroSessionState
+  session_type SessionType
+  state        PomodoroSessionState
 
-  focus_duration_seconds Int
-  break_duration_seconds Int
+  duration_seconds Int
 
   started_at DateTime  @db.Timestamptz
   ended_at   DateTime? @db.Timestamptz

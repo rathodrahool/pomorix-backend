@@ -3,11 +3,11 @@ import { PomodoroSessionService } from './pomodoro-session.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import type { AuthenticatedUser } from 'src/auth/interfaces/authenticated-user.interface';
-import { JoiValidationPipe } from 'src/common/joi-validation.pipe';
-import { startPomodoroSchema } from './validation/pomodoro.validation';
 import type { StartPomodoroDto } from './dto/start-pomodoro.dto';
 import { ApiResponse } from 'src/common/api-response';
 import { MESSAGE } from 'src/common/response-messages';
+import { JoiValidationPipe } from 'src/common/joi-validation.pipe';
+import { startPomodoroSchema } from './validation/pomodoro.validation';
 
 @Controller('pomodoro-session')
 export class PomodoroSessionController {
