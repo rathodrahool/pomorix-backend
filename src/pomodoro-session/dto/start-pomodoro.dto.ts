@@ -1,4 +1,5 @@
-export interface StartPomodoroDto {
-    focus_duration_seconds: number;
-    break_duration_seconds: number;
+import { SessionType } from '@prisma/client';
+
+export class StartPomodoroDto {
+    session_type: SessionType;
 }

@@ -9,11 +9,22 @@ export const MESSAGE = {
     },
     POMODORO: {
       STARTED: 'Pomodoro session started successfully',
+      STARTED_FOCUS: 'Focus session started!',
+      STARTED_SHORT_BREAK: 'Short break started. Relax!',
+      STARTED_LONG_BREAK: 'Long break started. Take your time!',
       CURRENT: 'Current session retrieved successfully',
       NO_ACTIVE: 'No active session',
       PAUSED: 'Pomodoro session paused successfully',
       RESUMED: 'Pomodoro session resumed successfully',
       COMPLETED: 'Pomodoro session completed successfully',
+      COMPLETED_FOCUS: 'Focus completed! Great work.',
+      COMPLETED_BREAK: 'Break completed!',
+      ABORTED: 'Pomodoro session aborted successfully',
+    },
+    USER_SETTINGS: {
+      RETRIEVED: 'User settings retrieved successfully',
+      UPDATED: 'User settings updated successfully',
+      RESET: 'User settings reset to defaults successfully',
     },
   },
   ERROR: {
@@ -32,6 +43,7 @@ export const MESSAGE = {
       ALREADY_PAUSED: 'Session is already paused',
       NOT_PAUSED: 'Session is not paused',
       CANNOT_COMPLETE: 'Only focus sessions can be completed',
+      NO_TASKS_FOUND: 'No tasks found. Please create a task first.',
     },
   },
 };
