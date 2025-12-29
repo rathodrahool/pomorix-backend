@@ -3,10 +3,14 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import type { StartPomodoroDto } from './dto/start-pomodoro.dto';
 import { PomodoroSessionState, SessionType } from '@prisma/client';
 import { MESSAGE } from 'src/common/response-messages';
+import { StreakService } from 'src/streak/streak.service';
 
 @Injectable()
 export class PomodoroSessionService {
-    constructor(private readonly prisma: PrismaService) { }
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly streakService: StreakService,
+    ) { }
 
     async start(userId: string, dto: StartPomodoroDto) {
         // Business Rule 1: Check if user has an active task (only for FOCUS sessions)
@@ -295,8 +299,14 @@ export class PomodoroSessionService {
             }
         });
 
-        // TODO: Emit SESSION_COMPLETED event for streak/badge/stats modules
-        // This will be implemented when we add those modules
+        // Emit SESSION_COMPLETED event for streak module (only for FOCUS sessions)
+        if (session.session_type === SessionType.FOCUS) {
+            await this.streakService.handleSessionCompleted(
+                userId,
+                new Date(),
+                'UTC', // TODO: Get user's actual timezone from settings
+            );
+        }
     }
 
     // Helper Methods

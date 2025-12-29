@@ -26,6 +26,9 @@ export const MESSAGE = {
       UPDATED: 'User settings updated successfully',
       RESET: 'User settings reset to defaults successfully',
     },
+    STREAK: {
+      RETRIEVED: 'Streak retrieved successfully',
+    },
   },
   ERROR: {
     NOT_FOUND: (module: string) => `${module} not found`,
@@ -44,6 +47,9 @@ export const MESSAGE = {
       NOT_PAUSED: 'Session is not paused',
       CANNOT_COMPLETE: 'Only focus sessions can be completed',
       NO_TASKS_FOUND: 'No tasks found. Please create a task first.',
+    },
+    STREAK: {
+      CALCULATION_ERROR: 'Error calculating streak',
     },
   },
 };
