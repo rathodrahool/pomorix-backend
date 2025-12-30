@@ -4,12 +4,14 @@ import type { StartPomodoroDto } from './dto/start-pomodoro.dto';
 import { PomodoroSessionState, SessionType } from '@prisma/client';
 import { MESSAGE } from 'src/common/response-messages';
 import { StreakService } from 'src/streak/streak.service';
+import { BadgeService } from 'src/badge/badge.service';
 
 @Injectable()
 export class PomodoroSessionService {
     constructor(
         private readonly prisma: PrismaService,
         private readonly streakService: StreakService,
+        private readonly badgeService: BadgeService,
     ) { }
 
     async start(userId: string, dto: StartPomodoroDto) {
@@ -306,6 +308,9 @@ export class PomodoroSessionService {
                 new Date(),
                 'UTC', // TODO: Get user's actual timezone from settings
             );
+
+            // Check and award badges after streak update
+            await this.badgeService.checkAndAwardBadges(userId);
         }
     }
 
