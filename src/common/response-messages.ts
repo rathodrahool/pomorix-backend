@@ -29,6 +29,11 @@ export const MESSAGE = {
     STREAK: {
       RETRIEVED: 'Streak retrieved successfully',
     },
+    BADGE: {
+      RETRIEVED: 'Badges retrieved successfully',
+      UNLOCKED: 'Badge unlocked!',
+      ALL_DEFINITIONS: 'Badge definitions retrieved successfully',
+    },
   },
   ERROR: {
     NOT_FOUND: (module: string) => `${module} not found`,
@@ -50,6 +55,10 @@ export const MESSAGE = {
     },
     STREAK: {
       CALCULATION_ERROR: 'Error calculating streak',
+    },
+    BADGE: {
+      NOT_FOUND: 'Badge not found',
+      ALREADY_UNLOCKED: 'Badge already unlocked',
     },
   },
 };

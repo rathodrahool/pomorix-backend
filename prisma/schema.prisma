@@ -43,6 +43,19 @@ enum TickingSound {
   WHITE_NOISE
 }
 
+enum BadgeCategory {
+  ONBOARDING
+  STREAK
+  VOLUME
+  INTENSITY
+}
+
+enum BadgeRuleType {
+  SESSION_COUNT
+  STREAK_COUNT
+  DAILY_COUNT
+}
+
 model users {
   id               String       @id @default(uuid())
   email            String       @unique @db.VarChar(255)
@@ -59,6 +72,7 @@ model users {
   userSettings     user_settings?
   userStreak       user_streaks?
   dailyActivities  daily_activity[]
+  badges           user_badges[]
 }
 
 model tasks {
@@ -169,5 +183,42 @@ model daily_activity {
   user users @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@id([user_id, activity_date])
+  @@index([user_id])
+}
+
+model badge_definitions {
+  id String @id @default(uuid())
+
+  code        String        @unique @db.VarChar(50)
+  title       String        @db.VarChar(100)
+  description String        @db.VarChar(255)
+  category    BadgeCategory
+  rule_type   BadgeRuleType
+  rule_value  Int
+
+  is_active Boolean @default(true)
+
+  created_at DateTime @default(now()) @db.Timestamptz
+  updated_at DateTime @updatedAt @db.Timestamptz
+
+  // relations
+  earned_by user_badges[]
+
+  @@index([is_active])
+}
+
+model user_badges {
+  id String @id @default(uuid())
+
+  user_id  String
+  badge_id String
+
+  unlocked_at DateTime @default(now()) @db.Timestamptz
+
+  // relations
+  user  users             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  badge badge_definitions @relation(fields: [badge_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, badge_id])
   @@index([user_id])
 }
