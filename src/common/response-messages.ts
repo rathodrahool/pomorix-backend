@@ -28,6 +28,7 @@ export const MESSAGE = {
     },
     STREAK: {
       RETRIEVED: 'Streak retrieved successfully',
+      TOTAL_STATS_RETRIEVED: 'Total statistics retrieved successfully',
     },
     BADGE: {
       RETRIEVED: 'Badges retrieved successfully',

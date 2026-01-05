@@ -130,9 +130,10 @@ model user_settings {
   user_id String @unique
 
   // Timer Settings (in minutes)
-  pomodoro_duration Int @default(25) // 5-60 minutes
-  short_break       Int @default(5) // 1-15 minutes
-  long_break        Int @default(15) // 5-45 minutes
+  pomodoro_duration    Int @default(25) // 5-60 minutes
+  short_break          Int @default(5) // 1-15 minutes
+  long_break           Int @default(15) // 5-45 minutes
+  daily_goal_pomodoros Int @default(1)
 
   // Sounds & Notifications
   alarm_sound   AlarmSound   @default(BELLS)

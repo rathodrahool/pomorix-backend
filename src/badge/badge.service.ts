@@ -36,6 +36,8 @@ export class BadgeService {
         return definitions.map((def) => ({
             id: def.id,
             code: def.code,
+            rule_type: def.rule_type,
+            rule_value: def.rule_value,
             title: def.title,
             description: def.description,
             category: def.category,

@@ -6,6 +6,7 @@ export const updateUserSettingsSchema = Joi.object({
     pomodoro_duration: Joi.number().integer().optional(),
     short_break: Joi.number().integer().optional(),
     long_break: Joi.number().integer().optional(),
+    daily_goal_pomodoros: Joi.number().integer().min(1).max(20).optional(),
 
     // Sounds & Notifications
     alarm_sound: Joi.string().valid(...Object.values(AlarmSound)).optional(),

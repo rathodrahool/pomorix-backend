@@ -5,6 +5,7 @@ export interface UpdateUserSettingsDto {
     pomodoro_duration?: number; // 5-60 minutes
     short_break?: number; // 1-15 minutes
     long_break?: number; // 5-45 minutes
+    daily_goal_pomodoros?: number; // 1-20 pomodoros
 
     // Sounds & Notifications
     alarm_sound?: AlarmSound

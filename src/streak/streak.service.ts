@@ -2,6 +2,8 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { format, parseISO, differenceInDays } from 'date-fns';
 import type { StreakResponseDto } from './dto/streak-response.dto';
+import type { TotalStatsResponseDto } from './dto/total-stats-response.dto';
+import { PomodoroSessionState, SessionType } from '@prisma/client';
 
 @Injectable()
 export class StreakService {
@@ -20,12 +22,81 @@ export class StreakService {
             });
         }
 
+        // Check if streak is broken (user skipped a day)
+        let currentStreak = userStreak.current_streak;
+
+        if (userStreak.last_active_date) {
+            const today = new Date();
+            const todayDate = parseISO(format(today, 'yyyy-MM-dd'));
+            const daysSinceLastActive = differenceInDays(
+                todayDate,
+                userStreak.last_active_date,
+            );
+
+            // If last active was more than 1 day ago, streak is broken
+            if (daysSinceLastActive > 1) {
+                currentStreak = 0;
+            }
+        }
+
         return {
-            current_streak: userStreak.current_streak,
+            current_streak: currentStreak,
             longest_streak: userStreak.longest_streak,
             last_active_date: userStreak.last_active_date
                 ? format(userStreak.last_active_date, 'yyyy-MM-dd')
                 : null,
+        };
+    }
+
+    async getTotalStats(userId: string): Promise<TotalStatsResponseDto> {
+        // Get all completed focus sessions for the user
+        const completedSessions = await this.prisma.pomodoro_sessions.findMany({
+            where: {
+                user_id: userId,
+                session_type: SessionType.FOCUS,
+                state: PomodoroSessionState.COMPLETED,
+            },
+            select: {
+                started_at: true,
+                ended_at: true,
+                total_pause_seconds: true,
+            },
+        });
+
+        // Calculate total pomodoros
+        const totalPomodoros = completedSessions.length;
+
+        // Calculate total time spent in seconds
+        const totalSeconds = completedSessions.reduce((total, session) => {
+            if (session.ended_at && session.started_at) {
+                // Calculate actual time spent: (end - start) - pauses
+                const sessionDurationMs =
+                    session.ended_at.getTime() - session.started_at.getTime();
+                const sessionDurationSeconds = Math.floor(sessionDurationMs / 1000);
+                const actualSeconds =
+                    sessionDurationSeconds - session.total_pause_seconds;
+                return total + actualSeconds;
+            }
+            return total;
+        }, 0);
+
+        // Convert to hours and minutes
+        const totalMinutes = Math.floor(totalSeconds / 60);
+        const totalHours = Number((totalSeconds / 3600).toFixed(2));
+
+        // Calculate today's pomodoros
+        const today = new Date();
+        const todayDateString = format(today, 'yyyy-MM-dd');
+        const todayPomodoros = completedSessions.filter((session) => {
+            const sessionDateString = format(session.started_at, 'yyyy-MM-dd');
+            return sessionDateString === todayDateString;
+        }).length;
+
+        return {
+            total_pomodoros: totalPomodoros,
+            total_hours: totalHours,
+            total_minutes: totalMinutes,
+            today_pomodoros: todayPomodoros,
         };
     }
 
@@ -90,7 +161,7 @@ export class StreakService {
                 // Consecutive day - increment
                 newCurrentStreak = userStreak.current_streak + 1;
             } else {
-                // Gap - reset to 1
+                // Gap - reset to 1 (user is back today, starting fresh)
                 newCurrentStreak = 1;
             }
         }
