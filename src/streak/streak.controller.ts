@@ -20,4 +20,15 @@ export class StreakController {
             streak,
         );
     }
+
+    @Get('total-stats')
+    @UseGuards(JwtAuthGuard)
+    async getTotalStats(@CurrentUser() user: AuthenticatedUser) {
+        const stats = await this.streakService.getTotalStats(user.id);
+        return ApiResponse.success(
+            HttpStatus.OK,
+            MESSAGE.SUCCESS.STREAK.TOTAL_STATS_RETRIEVED,
+            stats,
+        );
+    }
 }
