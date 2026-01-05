@@ -84,10 +84,19 @@ export class StreakService {
         const totalMinutes = Math.floor(totalSeconds / 60);
         const totalHours = Number((totalSeconds / 3600).toFixed(2));
 
+        // Calculate today's pomodoros
+        const today = new Date();
+        const todayDateString = format(today, 'yyyy-MM-dd');
+        const todayPomodoros = completedSessions.filter((session) => {
+            const sessionDateString = format(session.started_at, 'yyyy-MM-dd');
+            return sessionDateString === todayDateString;
+        }).length;
+
         return {
             total_pomodoros: totalPomodoros,
             total_hours: totalHours,
             total_minutes: totalMinutes,
+            today_pomodoros: todayPomodoros,
         };
     }
 
