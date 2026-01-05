@@ -20,8 +20,25 @@ export class StreakService {
             });
         }
 
+        // Check if streak is broken (user skipped a day)
+        let currentStreak = userStreak.current_streak;
+
+        if (userStreak.last_active_date) {
+            const today = new Date();
+            const todayDate = parseISO(format(today, 'yyyy-MM-dd'));
+            const daysSinceLastActive = differenceInDays(
+                todayDate,
+                userStreak.last_active_date,
+            );
+
+            // If last active was more than 1 day ago, streak is broken
+            if (daysSinceLastActive > 1) {
+                currentStreak = 0;
+            }
+        }
+
         return {
-            current_streak: userStreak.current_streak,
+            current_streak: currentStreak,
             longest_streak: userStreak.longest_streak,
             last_active_date: userStreak.last_active_date
                 ? format(userStreak.last_active_date, 'yyyy-MM-dd')
@@ -90,7 +107,7 @@ export class StreakService {
                 // Consecutive day - increment
                 newCurrentStreak = userStreak.current_streak + 1;
             } else {
-                // Gap - reset to 1
+                // Gap - reset to 1 (user is back today, starting fresh)
                 newCurrentStreak = 1;
             }
         }
