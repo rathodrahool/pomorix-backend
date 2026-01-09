@@ -35,6 +35,10 @@ export const MESSAGE = {
       UNLOCKED: 'Badge unlocked!',
       ALL_DEFINITIONS: 'Badge definitions retrieved successfully',
     },
+    GLOBAL: {
+      FEED_RETRIEVED: 'Global feed retrieved successfully',
+      ONLINE_COUNT_RETRIEVED: 'Online count retrieved successfully',
+    },
   },
   ERROR: {
     NOT_FOUND: (module: string) => `${module} not found`,
