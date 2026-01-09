@@ -12,6 +12,7 @@ import { UserSettingsModule } from './user-settings/user-settings.module';
 import { StreakModule } from './streak/streak.module';
 import { BadgeModule } from './badge/badge.module';
 import { GlobalModule } from './global/global.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { GlobalModule } from './global/global.module';
     StreakModule,
     BadgeModule,
     GlobalModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
