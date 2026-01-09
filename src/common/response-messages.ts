@@ -39,6 +39,9 @@ export const MESSAGE = {
       FEED_RETRIEVED: 'Global feed retrieved successfully',
       ONLINE_COUNT_RETRIEVED: 'Online count retrieved successfully',
     },
+    USER: {
+      PROFILE_RETRIEVED: 'User profile retrieved successfully',
+    },
   },
   ERROR: {
     NOT_FOUND: (module: string) => `${module} not found`,
