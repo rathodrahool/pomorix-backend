@@ -11,6 +11,7 @@ import { PomodoroSessionModule } from './pomodoro-session/pomodoro-session.modul
 import { UserSettingsModule } from './user-settings/user-settings.module';
 import { StreakModule } from './streak/streak.module';
 import { BadgeModule } from './badge/badge.module';
+import { GlobalModule } from './global/global.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { BadgeModule } from './badge/badge.module';
     UserSettingsModule,
     StreakModule,
     BadgeModule,
+    GlobalModule,
   ],
   controllers: [AppController],
   providers: [AppService],
