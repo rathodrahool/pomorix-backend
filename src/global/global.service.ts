@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { GlobalFeedQueryDto, GlobalFeedResponseDto } from './dto/global-feed.dto';
+import { OnlineCountResponseDto } from './dto/online-count.dto';
 import { PomodoroSessionState } from '@prisma/client';
 
 @Injectable()
@@ -90,6 +91,32 @@ export class GlobalService {
         return {
             online_count,
             items,
+        };
+    }
+
+    async getOnlineCount(): Promise<OnlineCountResponseDto> {
+        // Define the "active window" (2 minutes ago)
+        const activeThreshold = new Date(Date.now() - 2 * 60 * 1000);
+
+        // Count distinct online users
+        const onlineUsers = await this.prisma.pomodoro_sessions.findMany({
+            where: {
+                state: {
+                    in: [PomodoroSessionState.FOCUS, PomodoroSessionState.BREAK],
+                },
+                ended_at: null,
+                updated_at: {
+                    gte: activeThreshold,
+                },
+            },
+            select: {
+                user_id: true,
+            },
+            distinct: ['user_id'],
+        });
+
+        return {
+            online_count: onlineUsers.length,
         };
     }
 }

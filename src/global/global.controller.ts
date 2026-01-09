@@ -22,4 +22,14 @@ export class GlobalController {
             result,
         );
     }
+
+    @Get('online-count')
+    async getOnlineCount() {
+        const result = await this.globalService.getOnlineCount();
+        return ApiResponse.success(
+            HttpStatus.OK,
+            MESSAGE.SUCCESS.GLOBAL.ONLINE_COUNT_RETRIEVED,
+            result,
+        );
+    }
 }
