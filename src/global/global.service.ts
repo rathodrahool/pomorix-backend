@@ -11,8 +11,8 @@ export class GlobalService {
     async getGlobalFeed(query: GlobalFeedQueryDto): Promise<GlobalFeedResponseDto> {
         const { limit } = query;
 
-        // Define the "active window" (2 minutes ago)
-        const activeThreshold = new Date(Date.now() - 2 * 60 * 1000);
+        // Define the "active window" (5 minutes ago)
+        const activeThreshold = new Date(Date.now() - 5 * 60 * 1000);
 
         // Fetch active sessions
         const sessions = await this.prisma.pomodoro_sessions.findMany({
@@ -95,8 +95,8 @@ export class GlobalService {
     }
 
     async getOnlineCount(): Promise<OnlineCountResponseDto> {
-        // Define the "active window" (2 minutes ago)
-        const activeThreshold = new Date(Date.now() - 2 * 60 * 1000);
+        // Define the "active window" (5 minutes ago)
+        const activeThreshold = new Date(Date.now() - 5 * 60 * 1000);
 
         // Count distinct online users
         const onlineUsers = await this.prisma.pomodoro_sessions.findMany({
