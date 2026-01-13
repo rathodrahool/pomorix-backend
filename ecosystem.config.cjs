@@ -3,8 +3,8 @@ module.exports = {
         {
             name: "pomorix-backend",
             script: "./dist/src/main.js", // NestJS compiled output
-            instances: "max",
-            exec_mode: "cluster",
+            instances: 1,
+            exec_mode: "fork",
             watch: false,
             max_memory_restart: "500M",
             error_file: "./logs/err.log",
