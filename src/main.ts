@@ -12,6 +12,7 @@ async function bootstrap() {
       'http://localhost:5174',         // local frontend
       'http://localhost:3000',
       'https://pomorix.space',
+      'https://www.pomorix.space'
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: 'Content-Type, Authorization',
