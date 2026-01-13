@@ -8,9 +8,10 @@ async function bootstrap() {
 
   app.enableCors({
     origin: [
-      'http://localhost:5173',           // local frontend
+      'http://localhost:5173',
+      'http://localhost:5174',         // local frontend
       'http://localhost:3000',
-      'http://ec2-43-204-218-98.ap-south-1.compute.amazonaws.com/',
+      'https://pomorix.space',
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: 'Content-Type, Authorization',
