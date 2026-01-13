@@ -5,10 +5,15 @@ import { HttpExceptionFilter } from './common/http-exception.filter';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Enable CORS for all origins (restrict in production)
+
   app.enableCors({
-    origin: '*', // Allow all origins for now
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    origin: [
+      'http://localhost:5173',           // local frontend
+      'http://localhost:3000',
+      'http://ec2-43-204-218-98.ap-south-1.compute.amazonaws.com/',
+    ],
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders: 'Content-Type, Authorization',
     credentials: true,
   });
 
