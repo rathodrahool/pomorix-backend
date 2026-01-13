@@ -6,15 +6,73 @@ datasource db {
   provider = "postgresql"
 }
 
-model users {
-  id String @id @default(uuid())
+enum AuthProvider {
+  GOOGLE
+  APPLE
+}
 
-  created_at DateTime  @default(now()) @db.Timestamptz
-  updated_at DateTime  @updatedAt @db.Timestamptz
-  deleted_at DateTime? @db.Timestamptz
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum PomodoroSessionState {
+  FOCUS
+  BREAK
+  COMPLETED
+  ABORTED
+}
+
+enum SessionType {
+  FOCUS
+  SHORT_BREAK
+  LONG_BREAK
+}
+
+enum AlarmSound {
+  BELLS
+  DIGITAL
+  BIRD
+  NONE
+}
+
+enum TickingSound {
+  NONE
+  TICKING_FAST
+  TICKING_SLOW
+  WHITE_NOISE
+}
+
+enum BadgeCategory {
+  ONBOARDING
+  STREAK
+  VOLUME
+  INTENSITY
+}
+
+enum BadgeRuleType {
+  SESSION_COUNT
+  STREAK_COUNT
+  DAILY_COUNT
+}
+
+model users {
+  id               String       @id @default(uuid())
+  email            String       @unique @db.VarChar(255)
+  auth_provider    AuthProvider @default(GOOGLE)
+  auth_provider_id String
+  status           UserStatus   @default(ACTIVE)
+  created_at       DateTime     @default(now()) @db.Timestamptz
+  updated_at       DateTime     @updatedAt @db.Timestamptz
+  deleted_at       DateTime?    @db.Timestamptz
 
   // relations
-  tasks tasks[]
+  tasks            tasks[]
+  pomodoroSessions pomodoro_sessions[]
+  userSettings     user_settings?
+  userStreak       user_streaks?
+  dailyActivities  daily_activity[]
+  badges           user_badges[]
 }
 
 model tasks {
@@ -23,12 +81,145 @@ model tasks {
   title     String
   is_active Boolean @default(false)
 
+  // Pomodoro estimation and tracking
+  estimated_pomodoros Int? // How many Pomodoros estimated for this task
+  completed_pomodoros Int     @default(0) // How many Pomodoros completed
+  is_completed        Boolean @default(false) // Auto-set when completed == estimated
+
   created_at DateTime  @default(now()) @db.Timestamptz
   updated_at DateTime  @updatedAt @db.Timestamptz
   deleted_at DateTime? @db.Timestamptz
 
   // relations
+  user             users               @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  pomodoroSessions pomodoro_sessions[]
+
+  @@index([user_id])
+}
+
+model pomodoro_sessions {
+  id String @id @default(uuid())
+
+  user_id String
+  task_id String
+
+  session_type SessionType
+  state        PomodoroSessionState
+
+  duration_seconds Int
+
+  started_at DateTime  @db.Timestamptz
+  ended_at   DateTime? @db.Timestamptz
+
+  paused_at           DateTime? @db.Timestamptz
+  total_pause_seconds Int       @default(0)
+
+  created_at DateTime @default(now()) @db.Timestamptz
+  updated_at DateTime @updatedAt @db.Timestamptz
+
+  // relations
+  user users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  task tasks @relation(fields: [task_id], references: [id], onDelete: Restrict)
+
+  @@index([user_id])
+  @@index([user_id, started_at(sort: Desc)])
+}
+
+model user_settings {
+  id      String @id @default(uuid())
+  user_id String @unique
+
+  // Timer Settings (in minutes)
+  pomodoro_duration    Int @default(25) // 5-60 minutes
+  short_break          Int @default(5) // 1-15 minutes
+  long_break           Int @default(15) // 5-45 minutes
+  daily_goal_pomodoros Int @default(1)
+
+  // Sounds & Notifications
+  alarm_sound   AlarmSound   @default(BELLS)
+  ticking_sound TickingSound @default(NONE)
+  volume        Int          @default(50) // 0-100%
+
+  // Automation
+  auto_start_breaks    Boolean @default(false)
+  auto_start_pomodoros Boolean @default(true)
+
+  created_at DateTime @default(now()) @db.Timestamptz
+  updated_at DateTime @updatedAt @db.Timestamptz
+
+  // relations
   user users @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
+  @@index([user_id])
+}
+
+model user_streaks {
+  id      String @id @default(uuid())
+  user_id String @unique
+
+  current_streak Int @default(0)
+  longest_streak Int @default(0)
+
+  last_active_date DateTime? @db.Date
+
+  created_at DateTime @default(now()) @db.Timestamptz
+  updated_at DateTime @updatedAt @db.Timestamptz
+
+  // relations
+  user users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+}
+
+model daily_activity {
+  user_id       String
+  activity_date DateTime @db.Date
+
+  pomodoro_count Int @default(1)
+
+  created_at DateTime @default(now()) @db.Timestamptz
+  updated_at DateTime @updatedAt @db.Timestamptz
+
+  // relations
+  user users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@id([user_id, activity_date])
+  @@index([user_id])
+}
+
+model badge_definitions {
+  id String @id @default(uuid())
+
+  code        String        @unique @db.VarChar(50)
+  title       String        @db.VarChar(100)
+  description String        @db.VarChar(255)
+  category    BadgeCategory
+  rule_type   BadgeRuleType
+  rule_value  Int
+
+  is_active Boolean @default(true)
+
+  created_at DateTime @default(now()) @db.Timestamptz
+  updated_at DateTime @updatedAt @db.Timestamptz
+
+  // relations
+  earned_by user_badges[]
+
+  @@index([is_active])
+}
+
+model user_badges {
+  id String @id @default(uuid())
+
+  user_id  String
+  badge_id String
+
+  unlocked_at DateTime @default(now()) @db.Timestamptz
+
+  // relations
+  user  users             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  badge badge_definitions @relation(fields: [badge_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, badge_id])
   @@index([user_id])
 }

@@ -10,27 +10,27 @@ import { FindAllTasksDto } from './dto/find-all-tasks.dto';
 export class TaskService {
     constructor(private readonly prisma: PrismaService) { }
 
-    async create(dto: CreateTaskDto) {
-        await this.prisma.tasks.create({
+    async create(userId: string, dto: CreateTaskDto) {
+        const result = await this.prisma.tasks.create({
             data: {
-                user_id: dto.user_id,
+                user_id: userId,
                 title: dto.title,
+                estimated_pomodoros: dto.estimated_pomodoros,
             },
         });
+        return { id: result.id };
     }
 
-    async findAll(query: FindAllTasksDto) {
-        const { page, page_size, sort_by, sort_order, search, user_id, is_active } = query;
+    async findAll(userId: string, query: FindAllTasksDto) {
+        const { page, page_size, sort_by, sort_order, search, is_active } = query;
 
         const where: Prisma.tasksWhereInput = {};
 
         // Always exclude soft-deleted tasks
         where.deleted_at = null;
 
-        // Filter by user_id if provided
-        if (user_id) {
-            where.user_id = user_id;
-        }
+        // Filter by authenticated user
+        where.user_id = userId;
 
         // Filter by is_active if provided
         if (is_active !== undefined) {
@@ -61,24 +61,24 @@ export class TaskService {
         };
     }
 
-    async findOne(id: string) {
+    async findOne(userId: string, id: string) {
         const task = await this.prisma.tasks.findUnique({
             where: { id },
         });
 
-        if (!task || task.deleted_at) {
+        if (!task || task.deleted_at || task.user_id !== userId) {
             throw new NotFoundException(MESSAGE.ERROR.NOT_FOUND('Task'));
         }
 
         return omit(task, ['deleted_at']);
     }
 
-    async update(id: string, updateTaskDto: UpdateTaskDto) {
+    async update(userId: string, id: string, updateTaskDto: UpdateTaskDto) {
         const task = await this.prisma.tasks.findUnique({
             where: { id },
         });
 
-        if (!task || task.deleted_at) {
+        if (!task || task.deleted_at || task.user_id !== userId) {
             throw new NotFoundException(MESSAGE.ERROR.NOT_FOUND('Task'));
         }
 
@@ -88,12 +88,12 @@ export class TaskService {
         });
     }
 
-    async toggleActive(id: string) {
+    async toggleActive(userId: string, id: string) {
         const task = await this.prisma.tasks.findUnique({
             where: { id },
         });
 
-        if (!task || task.deleted_at) {
+        if (!task || task.deleted_at || task.user_id !== userId) {
             throw new NotFoundException(MESSAGE.ERROR.NOT_FOUND('Task'));
         }
 
@@ -104,12 +104,12 @@ export class TaskService {
         });
     }
 
-    async remove(id: string) {
+    async remove(userId: string, id: string) {
         const task = await this.prisma.tasks.findUnique({
             where: { id },
         });
 
-        if (!task) {
+        if (!task || task.user_id !== userId) {
             throw new NotFoundException(MESSAGE.ERROR.NOT_FOUND('Task'));
         }
 
@@ -125,12 +125,12 @@ export class TaskService {
         });
     }
 
-    async restore(id: string) {
+    async restore(userId: string, id: string) {
         const task = await this.prisma.tasks.findUnique({
             where: { id },
         });
 
-        if (!task) {
+        if (!task || task.user_id !== userId) {
             throw new NotFoundException(MESSAGE.ERROR.NOT_FOUND('Task'));
         }
 

@@ -5,6 +5,14 @@ import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { envValidationSchema } from './config/env.validation';
 import { TaskModule } from './task/task.module';
+import { JwtModule } from './jwt/jwt.module';
+import { AuthModule } from './auth/auth.module';
+import { PomodoroSessionModule } from './pomodoro-session/pomodoro-session.module';
+import { UserSettingsModule } from './user-settings/user-settings.module';
+import { StreakModule } from './streak/streak.module';
+import { BadgeModule } from './badge/badge.module';
+import { GlobalModule } from './global/global.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -19,6 +27,14 @@ import { TaskModule } from './task/task.module';
     }), // load .env
     PrismaModule,
     TaskModule,
+    JwtModule,
+    AuthModule,
+    PomodoroSessionModule,
+    UserSettingsModule,
+    StreakModule,
+    BadgeModule,
+    GlobalModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
