@@ -113,18 +113,16 @@ jobs:
             # Create .env file if needed
             if [ ! -f .env ]; then
               echo "Creating .env file..."
-              cat > .env << 'ENVEOF'
-NODE_ENV=production
-PORT=3000
-DATABASE_URL=${{ secrets.DATABASE_URL }}
-JWT_SECRET=${{ secrets.JWT_SECRET }}
-JWT_EXPIRES_IN=${{ secrets.JWT_EXPIRES_IN }}
-ENVEOF
+              echo "NODE_ENV=production" > .env
+              echo "PORT=3000" >> .env
+              echo "DATABASE_URL=${DATABASE_URL}" >> .env
+              echo "JWT_SECRET=${JWT_SECRET}" >> .env
+              echo "JWT_EXPIRES_IN=${JWT_EXPIRES_IN}" >> .env
             else
               echo "Updating existing .env file..."
               # Update specific environment variables
-              sed -i "s|^DATABASE_URL=.*|DATABASE_URL=${{ secrets.DATABASE_URL }}|" .env
-              sed -i "s|^JWT_SECRET=.*|JWT_SECRET=${{ secrets.JWT_SECRET }}|" .env
+              sed -i "s|^DATABASE_URL=.*|DATABASE_URL=${DATABASE_URL}|" .env
+              sed -i "s|^JWT_SECRET=.*|JWT_SECRET=${JWT_SECRET}|" .env
             fi
             
             # Run database migrations
