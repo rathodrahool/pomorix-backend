@@ -42,12 +42,23 @@ export class PomodoroSessionService {
 
         // If there's an active session, abort it (user is switching)
         if (existingSession) {
+            const now = new Date();
+            let totalPauseSeconds = existingSession.total_pause_seconds;
+
+            // If it was paused, add the final pause duration
+            if (existingSession.paused_at) {
+                const pausedAt = new Date(existingSession.paused_at);
+                const pauseDuration = Math.floor((now.getTime() - pausedAt.getTime()) / 1000);
+                totalPauseSeconds += pauseDuration;
+            }
+
             await this.prisma.pomodoro_sessions.update({
                 where: { id: existingSession.id },
                 data: {
                     state: PomodoroSessionState.ABORTED,
-                    ended_at: new Date(),
+                    ended_at: now,
                     paused_at: null,
+                    total_pause_seconds: totalPauseSeconds,
                 },
             });
         }
@@ -242,15 +253,27 @@ export class PomodoroSessionService {
             throw new BadRequestException(MESSAGE.ERROR.POMODORO.NO_ACTIVE_SESSION);
         }
 
+        // 1. Mark session as completed
+        const now = new Date();
+        let totalPauseSeconds = session.total_pause_seconds;
+
+        // If currently paused, add the final pause duration to total_pause_seconds
+        if (session.paused_at) {
+            const pausedAt = new Date(session.paused_at);
+            const pauseDuration = Math.floor((now.getTime() - pausedAt.getTime()) / 1000);
+            totalPauseSeconds += Math.max(0, pauseDuration);
+        }
+
         // Use transaction to ensure atomicity
         await this.prisma.$transaction(async (tx) => {
-            // 1. Mark session as completed
+            // Update session
             await tx.pomodoro_sessions.update({
                 where: { id: session.id },
                 data: {
                     state: PomodoroSessionState.COMPLETED,
-                    ended_at: new Date(),
+                    ended_at: now,
                     paused_at: null,
+                    total_pause_seconds: totalPauseSeconds,
                 },
             });
 
