@@ -1,8 +1,8 @@
 module.exports = {
     apps: [
         {
-            name: "express-app",
-            script: "./dist/index.js", // TypeScript compiled output
+            name: "pomorix-backend",
+            script: "./dist/src/main.js", // NestJS compiled output
             instances: "max",
             exec_mode: "cluster",
             watch: false,
@@ -15,6 +15,10 @@ module.exports = {
             autorestart: true,
             max_restarts: 10,
             min_uptime: "10s",
+            env: {
+                NODE_ENV: "production",
+                PORT: 3000,
+            },
         },
     ],
 };
