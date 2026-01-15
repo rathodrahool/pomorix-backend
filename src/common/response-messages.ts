@@ -42,6 +42,9 @@ export const MESSAGE = {
     USER: {
       PROFILE_RETRIEVED: 'User profile retrieved successfully',
     },
+    BUG_REPORT: {
+      SUBMITTED: 'Bug report submitted successfully. Thank you!',
+    },
   },
   ERROR: {
     NOT_FOUND: (module: string) => `${module} not found`,
@@ -67,6 +70,10 @@ export const MESSAGE = {
     BADGE: {
       NOT_FOUND: 'Badge not found',
       ALREADY_UNLOCKED: 'Badge already unlocked',
+    },
+    BUG_REPORT: {
+      NOT_FOUND: 'Bug report not found',
+      INVALID_STATUS: 'Invalid status value',
     },
   },
 };
