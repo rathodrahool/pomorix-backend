@@ -13,6 +13,41 @@ export class AuthService {
     ) { }
 
     async signin(dto: SigninDto): Promise<SigninResponseDto> {
+        // Special case: Guest mode for testing
+        // Just check if guest user exists and allow login
+        if (dto.email === 'guest@pomorix.space') {
+            const guestUser = await this.prisma.users.findUnique({
+                where: { email: 'guest@pomorix.space' },
+                select: {
+                    id: true,
+                    email: true,
+                    auth_provider: true,
+                    auth_provider_id: true,
+                    status: true,
+                    deleted_at: true,
+                },
+            });
+
+            // If guest user exists and is not deleted, allow login
+            if (guestUser && !guestUser.deleted_at) {
+                const access_token = await this.jwtService.generateToken({
+                    userId: guestUser.id,
+                    email: guestUser.email,
+                });
+
+                return {
+                    user: {
+                        id: guestUser.id,
+                        email: guestUser.email,
+                        auth_provider: guestUser.auth_provider,
+                        auth_provider_id: guestUser.auth_provider_id,
+                        status: guestUser.status,
+                    },
+                    access_token,
+                };
+            }
+        }
+
         // Check if user already exists
         const existingUser = await this.prisma.users.findUnique({
             where: { email: dto.email },
