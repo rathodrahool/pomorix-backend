@@ -3,7 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
-import { envValidationSchema } from './config/env.validation';
+import { envValidationSchema } from '../config/env.validation';
 import { JwtModule } from './jwt/jwt.module';
 import { AuthModule } from './auth/auth.module';
 import { TodoModule } from './todo/todo.module';
@@ -12,13 +12,18 @@ import { TodoModule } from './todo/todo.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
+      envFilePath: [
+        `.env.${process.env.NODE_ENV || 'development'}.local`,
+        `.env.${process.env.NODE_ENV || 'development'}`,
+        '.env.local',
+        '.env',
+      ],
       validationSchema: envValidationSchema,
       validationOptions: {
         abortEarly: true,
         allUnknown: true,
       },
-    }), // load .env
+    }),
     PrismaModule,
     JwtModule,
     AuthModule,

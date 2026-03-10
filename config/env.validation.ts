@@ -1,6 +1,15 @@
 import * as Joi from 'joi';
 
 export const envValidationSchema = Joi.object({
+  NODE_ENV: Joi.string()
+    .valid('development', 'production', 'staging')
+    .default('development')
+    .messages({
+      'any.only': 'NODE_ENV must be one of: development, production, staging',
+    }),
+  PORT: Joi.number().default(3000).messages({
+    'number.base': 'PORT must be a number',
+  }),
   DATABASE_URL: Joi.string().uri().required().messages({
     'string.empty': 'DATABASE_URL is required',
   }),

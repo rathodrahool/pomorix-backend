@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { HttpExceptionFilter } from './common/http-exception.filter';
+import { HttpExceptionFilter } from '../common/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -21,5 +21,7 @@ async function bootstrap() {
 
   app.useGlobalFilters(new HttpExceptionFilter());
   await app.listen(process.env.PORT ?? 3000);
+
+  console.log(`🚀 Server running on port ${process.env.PORT ?? 3000} in ${process.env.NODE_ENV ?? 'development'} mode`);
 }
 bootstrap();

@@ -1,7 +1,7 @@
 import { Injectable, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '../jwt/jwt.service';
-import { MESSAGE } from '../common/response-messages';
+import { MESSAGE } from '../../common/response-messages';
 import { UserStatus } from '@prisma/client';
 import { SigninDto, SigninResponseDto } from './dto/signin.dto';
 

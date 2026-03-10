@@ -1,9 +1,9 @@
 import { Controller, Post, Body, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { JoiValidationPipe } from '../common/joi-validation.pipe';
+import { JoiValidationPipe } from '../../common/joi-validation.pipe';
 import { signinSchema } from './validation/auth.validation';
-import { ApiResponse } from '../common/api-response';
-import { MESSAGE } from '../common/response-messages';
+import { ApiResponse } from '../../common/api-response';
+import { MESSAGE } from '../../common/response-messages';
 import type { SigninDto } from './dto/signin.dto';
 
 @Controller('auth')

@@ -2,8 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTodoDto, UpdateTodoDto } from './dto/create-todo.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Prisma } from '@prisma/client';
-import { MESSAGE } from 'src/common/response-messages';
-import { omit, omitFromArray } from 'src/common/utils/omit.util';
+import { MESSAGE } from '../../common/response-messages';
+import { omit, omitFromArray } from '../../common/utils/omit.util';
 import { FindAllTodosDto } from './dto/find-all-todos.dto';
 
 @Injectable()
