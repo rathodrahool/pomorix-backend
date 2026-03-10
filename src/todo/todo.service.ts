@@ -2,9 +2,10 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTodoDto, UpdateTodoDto } from './dto/create-todo.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Prisma } from '@prisma/client';
-import { MESSAGE } from '../../common/response-messages';
+import { MESSAGE } from '../../common/constants/response-messages';
 import { omit, omitFromArray } from '../../common/utils/omit.util';
 import { FindAllTodosDto } from './dto/find-all-todos.dto';
+import logger from '../../common/utils/logger';
 
 @Injectable()
 export class TodoService {
@@ -19,6 +20,7 @@ export class TodoService {
                 priority: dto.priority ?? 'MEDIUM',
             },
         });
+        logger.info(`Task created successfully with ID: ${result.id} for user: ${userId}`);
         return { id: result.id };
     }
 
@@ -56,6 +58,8 @@ export class TodoService {
             orderBy: { [sort_by!]: sort_order! },
         });
 
+        logger.info(`Retrieved ${todos.length} tasks out of ${total} total for user: ${userId}`);
+
         return {
             data: omitFromArray(todos, ['deleted_at']),
             meta: {
@@ -73,6 +77,7 @@ export class TodoService {
         });
 
         if (!todo || todo.deleted_at || todo.user_id !== userId) {
+            logger.warn(`Task not found or unauthorized access attempt for ID: ${id} by user: ${userId}`);
             throw new NotFoundException(MESSAGE.ERROR.NOT_FOUND('Todo'));
         }
 
@@ -85,6 +90,7 @@ export class TodoService {
         });
 
         if (!todo || todo.deleted_at || todo.user_id !== userId) {
+            logger.warn(`Task update failed - not found for ID: ${id} by user: ${userId}`);
             throw new NotFoundException(MESSAGE.ERROR.NOT_FOUND('Todo'));
         }
 
@@ -92,6 +98,7 @@ export class TodoService {
             where: { id },
             data: updateTodoDto,
         });
+        logger.info(`Task updated successfully for ID: ${id}`);
     }
 
     async toggleCompleted(userId: string, id: string) {
@@ -100,6 +107,7 @@ export class TodoService {
         });
 
         if (!todo || todo.deleted_at || todo.user_id !== userId) {
+            logger.warn(`Task toggle completed failed - not found for ID: ${id} by user: ${userId}`);
             throw new NotFoundException(MESSAGE.ERROR.NOT_FOUND('Todo'));
         }
 
@@ -108,6 +116,7 @@ export class TodoService {
             where: { id },
             data: { is_completed: !todo.is_completed },
         });
+        logger.info(`Task toggled completed to ${!todo.is_completed} for ID: ${id}`);
     }
 
     async remove(userId: string, id: string) {
@@ -116,6 +125,7 @@ export class TodoService {
         });
 
         if (!todo || todo.user_id !== userId) {
+            logger.warn(`Task removal failed - not found for ID: ${id} by user: ${userId}`);
             throw new NotFoundException(MESSAGE.ERROR.NOT_FOUND('Todo'));
         }
 
@@ -129,6 +139,7 @@ export class TodoService {
             where: { id },
             data: { deleted_at: new Date() },
         });
+        logger.info(`Task soft deleted successfully for ID: ${id}`);
     }
 
     async restore(userId: string, id: string) {
@@ -137,6 +148,7 @@ export class TodoService {
         });
 
         if (!todo || todo.user_id !== userId) {
+            logger.warn(`Task restoration failed - not found for ID: ${id} by user: ${userId}`);
             throw new NotFoundException(MESSAGE.ERROR.NOT_FOUND('Todo'));
         }
 
@@ -149,5 +161,6 @@ export class TodoService {
             where: { id },
             data: { deleted_at: null },
         });
+        logger.info(`Task restored successfully for ID: ${id}`);
     }
 }

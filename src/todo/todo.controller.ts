@@ -12,13 +12,13 @@ import {
 } from '@nestjs/common';
 import { TodoService } from './todo.service';
 import type { CreateTodoDto, UpdateTodoDto } from './dto/create-todo.dto';
-import { JoiValidationPipe } from '../../common/joi-validation.pipe';
+import { JoiValidationPipe } from '../../common/pipes/joi-validation.pipe';
 import { createTodoSchema, updateTodoSchema } from './validation/todo.validation';
-import { ApiResponse } from '../../common/api-response';
-import { MESSAGE } from '../../common/response-messages';
+import { ApiResponse } from '../../common/helpers/api-response';
+import { MESSAGE } from '../../common/constants/response-messages';
 import type { FindAllTodosDto } from './dto/find-all-todos.dto';
 import { findAllTodosSchema } from './validation/find-all-todos.validation';
-import { UuidValidationPipe } from '../../common/uuid-validation.pipe';
+import { UuidValidationPipe } from '../../common/pipes/uuid-validation.pipe';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import type { AuthenticatedUser } from 'src/auth/interfaces/authenticated-user.interface';

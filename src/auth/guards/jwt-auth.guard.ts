@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '../../jwt/jwt.service';
 import { PrismaService } from '../../prisma/prisma.service';
-import { MESSAGE } from '../../../common/response-messages';
+import { MESSAGE } from '../../../common/constants/response-messages';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {

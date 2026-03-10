@@ -1,9 +1,10 @@
 import { Injectable, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '../jwt/jwt.service';
-import { MESSAGE } from '../../common/response-messages';
+import { MESSAGE } from '../../common/constants/response-messages';
 import { UserStatus } from '@prisma/client';
 import { SigninDto, SigninResponseDto } from './dto/signin.dto';
+import logger from '../../common/utils/logger';
 
 @Injectable()
 export class AuthService {
@@ -13,6 +14,8 @@ export class AuthService {
     ) { }
 
     async signin(dto: SigninDto): Promise<SigninResponseDto> {
+        logger.info(`Signin attempt for email: ${dto.email} via ${dto.auth_provider}`);
+
         // Special case: Guest mode for testing
         // Just check if guest user exists and allow login
         if (dto.email === 'guest@pomorix.space') {
@@ -34,6 +37,8 @@ export class AuthService {
                     userId: guestUser.id,
                     email: guestUser.email,
                 });
+
+                logger.info(`Guest user logged in successfully: ${guestUser.id}`);
 
                 return {
                     user: {
@@ -67,6 +72,8 @@ export class AuthService {
                 userId: existingUser.id,
                 email: existingUser.email,
             });
+
+            logger.info(`User logged in successfully: ${existingUser.id}`);
 
             return {
                 user: {
@@ -104,6 +111,8 @@ export class AuthService {
                 email: restoredUser.email,
             });
 
+            logger.info(`Soft-deleted user restored and logged in: ${restoredUser.id}`);
+
             return {
                 user: restoredUser,
                 access_token,
@@ -132,6 +141,8 @@ export class AuthService {
             userId: user.id,
             email: user.email,
         });
+
+        logger.info(`New user signed up and logged in: ${user.id}`);
 
         return {
             user,
