@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
-import { TaskService } from './task.service';
-import { TaskController } from './task.controller';
+import { TodoService } from './todo.service';
+import { TodoController } from './todo.controller';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { JwtModule } from 'src/jwt/jwt.module';
 
 @Module({
   imports: [PrismaModule, JwtModule],
-  controllers: [TaskController],
-  providers: [TaskService],
+  controllers: [TodoController],
+  providers: [TodoService],
 })
-export class TaskModule { }
+export class TodoModule { }

@@ -10,45 +10,45 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { TaskService } from './task.service';
-import type { CreateTaskDto, UpdateTaskDto } from './dto/create-task.dto';
+import { TodoService } from './todo.service';
+import type { CreateTodoDto, UpdateTodoDto } from './dto/create-todo.dto';
 import { JoiValidationPipe } from 'src/common/joi-validation.pipe';
-import { createTaskSchema, updateTaskSchema } from './validation/task.validation';
+import { createTodoSchema, updateTodoSchema } from './validation/todo.validation';
 import { ApiResponse } from 'src/common/api-response';
 import { MESSAGE } from 'src/common/response-messages';
-import type { FindAllTasksDto } from './dto/find-all-tasks.dto';
-import { findAllTasksSchema } from './validation/find-all-tasks.validation';
+import type { FindAllTodosDto } from './dto/find-all-todos.dto';
+import { findAllTodosSchema } from './validation/find-all-todos.validation';
 import { UuidValidationPipe } from 'src/common/uuid-validation.pipe';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import type { AuthenticatedUser } from 'src/auth/interfaces/authenticated-user.interface';
 
-@Controller('tasks')
-export class TaskController {
-  constructor(private readonly taskService: TaskService) { }
+@Controller('todos')
+export class TodoController {
+  constructor(private readonly todoService: TodoService) { }
 
   @Post()
   @UseGuards(JwtAuthGuard)
   async create(
     @CurrentUser() user: AuthenticatedUser,
-    @Body(new JoiValidationPipe(createTaskSchema))
-    createTaskDto: CreateTaskDto,
+    @Body(new JoiValidationPipe(createTodoSchema))
+    createTodoDto: CreateTodoDto,
   ) {
-    const result = await this.taskService.create(user.id, createTaskDto);
-    return ApiResponse.success(HttpStatus.CREATED, MESSAGE.SUCCESS.CREATE('Task'), result);
+    const result = await this.todoService.create(user.id, createTodoDto);
+    return ApiResponse.success(HttpStatus.CREATED, MESSAGE.SUCCESS.CREATE('Todo'), result);
   }
 
   @Get()
   @UseGuards(JwtAuthGuard)
   async findAll(
     @CurrentUser() user: AuthenticatedUser,
-    @Query(new JoiValidationPipe(findAllTasksSchema))
-    query: FindAllTasksDto,
+    @Query(new JoiValidationPipe(findAllTodosSchema))
+    query: FindAllTodosDto,
   ) {
-    const result = await this.taskService.findAll(user.id, query);
+    const result = await this.todoService.findAll(user.id, query);
     return ApiResponse.successPaginated(
       HttpStatus.OK,
-      MESSAGE.SUCCESS.RETRIEVE('Tasks'),
+      MESSAGE.SUCCESS.RETRIEVE('Todos'),
       result.data,
       result.meta,
     );
@@ -60,8 +60,8 @@ export class TaskController {
     @CurrentUser() user: AuthenticatedUser,
     @Param('id', UuidValidationPipe) id: string,
   ) {
-    const task = await this.taskService.findOne(user.id, id);
-    return ApiResponse.success(HttpStatus.OK, MESSAGE.SUCCESS.RETRIEVE('Task'), task);
+    const todo = await this.todoService.findOne(user.id, id);
+    return ApiResponse.success(HttpStatus.OK, MESSAGE.SUCCESS.RETRIEVE('Todo'), todo);
   }
 
   @Patch(':id')
@@ -69,21 +69,21 @@ export class TaskController {
   async update(
     @CurrentUser() user: AuthenticatedUser,
     @Param('id', UuidValidationPipe) id: string,
-    @Body(new JoiValidationPipe(updateTaskSchema))
-    updateTaskDto: UpdateTaskDto,
+    @Body(new JoiValidationPipe(updateTodoSchema))
+    updateTodoDto: UpdateTodoDto,
   ) {
-    await this.taskService.update(user.id, id, updateTaskDto);
-    return ApiResponse.success(HttpStatus.OK, MESSAGE.SUCCESS.UPDATE('Task'));
+    await this.todoService.update(user.id, id, updateTodoDto);
+    return ApiResponse.success(HttpStatus.OK, MESSAGE.SUCCESS.UPDATE('Todo'));
   }
 
-  @Patch(':id/toggle-active')
+  @Patch(':id/toggle-completed')
   @UseGuards(JwtAuthGuard)
-  async toggleActive(
+  async toggleCompleted(
     @CurrentUser() user: AuthenticatedUser,
     @Param('id', UuidValidationPipe) id: string,
   ) {
-    await this.taskService.toggleActive(user.id, id);
-    return ApiResponse.success(HttpStatus.OK, MESSAGE.SUCCESS.UPDATE('Task'));
+    await this.todoService.toggleCompleted(user.id, id);
+    return ApiResponse.success(HttpStatus.OK, MESSAGE.SUCCESS.UPDATE('Todo'));
   }
 
   @Delete(':id')
@@ -92,8 +92,8 @@ export class TaskController {
     @CurrentUser() user: AuthenticatedUser,
     @Param('id', UuidValidationPipe) id: string,
   ) {
-    await this.taskService.remove(user.id, id);
-    return ApiResponse.success(HttpStatus.OK, MESSAGE.SUCCESS.DELETE('Task'));
+    await this.todoService.remove(user.id, id);
+    return ApiResponse.success(HttpStatus.OK, MESSAGE.SUCCESS.DELETE('Todo'));
   }
 
   @Patch(':id/restore')
@@ -102,7 +102,7 @@ export class TaskController {
     @CurrentUser() user: AuthenticatedUser,
     @Param('id', UuidValidationPipe) id: string,
   ) {
-    await this.taskService.restore(user.id, id);
-    return ApiResponse.success(HttpStatus.OK, MESSAGE.SUCCESS.UPDATE('Task'));
+    await this.todoService.restore(user.id, id);
+    return ApiResponse.success(HttpStatus.OK, MESSAGE.SUCCESS.UPDATE('Todo'));
   }
 }
